@@ -3,20 +3,21 @@
 <img src="https://i.imgur.com/ZUlzhaN.jpeg" width="300" height="300">
 
 [![Telegram]][Telegram join]
-[![Code style: black]][black code style]
 [![License]][LICENSE.md]
+![pre-commit](https://github.com/biobdeveloper/zverobot/workflows/pre-commit/badge.svg)
+[![Code style: black]][black code style]
 
 </div>
 
-[Zverobot][Telegram join] is the telegram bot to help homeless pets by [DvaPsa (means "Two dogs" on russian)](https://www.instagram.com/dva.psa/) team
+[Zverobot][Telegram join] is the telegram bot created to help homeless pets by [DvaPsa (means "Two dogs" on russian)](https://www.instagram.com/dva.psa/) team
 
 Check it out https://t.me/zverobot
 
-Homeless pets always needs some money. If you want to support us, you can contact DvaPsa Team at the links above
+Homeless pets always need some money. If you want to support us, you can contact DvaPsa Team at the links above
 
 Currently bot works only for russian-speaking users. But we have big plans :)
 
-Zverobot is fully asynchronous, writen on Python 3. Special thanks to the greatest Telegram Bot python library [aiogram](https://github.com/aiogram/aiogram)
+Zverobot is fully asynchronous, written on Python 3. Special thanks to the greatest Telegram Bot python library [aiogram](https://github.com/aiogram/aiogram)
 
 
 # How to deploy
@@ -44,6 +45,11 @@ cd zverobot/
 Create configuration files from examples and fill it with your data
 ```bash
 cp .env.example .env
+```
+
+If you run it with native docker-compose.yml configuration, create docker network by
+```bash
+sudo docker network create zverobot-network
 ```
 
 Start the services by running the command:
