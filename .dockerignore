@@ -1,0 +1,33 @@
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+docker-compose.yml
+.dockerignore
+
+# Markdown files
+**/*.md
+
+# GitHub
+.github/
+
+# Examples
+*.example
+
+# Logs
+**/*.log
+
+# Byte-compiled / optimized / DLL files
+**/__pycache__/
+**/*.pyc
+
+# Unit test / coverage reports
+tests/
+.pytest_cache/
+.mypy_cache
+
+
+# IDEA folder
+.idea/

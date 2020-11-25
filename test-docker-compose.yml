@@ -1,0 +1,46 @@
+version: '3.2'
+
+services:
+
+  test_runner:
+    build: tests
+    container_name: zverobot-test
+    volumes:
+      - ./:/zverobot
+    command: >
+      bash -c "pipenv install --dev &&
+      pipenv run alembic upgrade head
+      && pipenv run pytest"
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
+    networks:
+      - zverobot-test-network
+
+  postgres:
+      image: postgres:10
+      container_name: postgres-test
+      volumes:
+        - postgres-test-data:/var/lib/postgresql/test-data
+      environment:
+        - POSTGRES_USER=${DB_USER}
+        - POSTGRES_PASSWORD=${DB_PASSWORD}
+        - POSTGRES_DB=${DB_NAME}
+      expose:
+        - "${DB_PORT}"
+      ports:
+        - ${DB_PORT}:${DB_PORT}
+      command:
+        -p ${DB_PORT}
+      networks:
+        - zverobot-test-network
+
+
+volumes:
+  postgres-test-data:
+
+
+networks:
+  zverobot-test-network:
+    external: true

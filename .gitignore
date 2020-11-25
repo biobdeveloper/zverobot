@@ -1,0 +1,15 @@
+admin.py
+src/tg.handles.admin_hanlers.py
+
+venv/
+*.pytest_cache/
+*__pycache__/
+.idea/
+*.env
+
+# Certs and keys
+*.crt
+*.key
+
+.pics_storage/
+*.png
