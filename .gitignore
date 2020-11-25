@@ -1,5 +1,5 @@
 admin.py
-src/tg.handles.admin_hanlers.py
+src/tg/handlers/admin_handlers.py
 
 venv/
 *.pytest_cache/
