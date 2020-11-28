@@ -101,10 +101,6 @@ async def main_menu_handler(message: types.Message):
         msg = dp.bot.texts["messages"]["volunteers"]
         kb = None
 
-    elif message.text == dp.bot.texts["buttons"]["announcements"]:
-        msg = dp.bot.texts["messages"]["announcements"]
-        kb = None
-
     elif message.text == dp.bot.texts["buttons"]["about"]:
         await UserStates.about.set()
         msg = dp.bot.texts["messages"]["about"]
@@ -148,10 +144,10 @@ async def about_handler(message: types.Message):
 
 @dp.message_handler(state=[UserStates.post_view])
 async def help_choose_handler(message: types.Message, state: FSMContext):
-    if message.text == dp.bot.texts["buttons"]["bank_bills"]:
+    if message.text == dp.bot.texts["buttons"]["support_us"]:
         await dp.bot.safe_send_message(
             chat_id=message.chat.id,
-            text=dp.bot.texts["messages"]["bank_bills"],
+            text=dp.bot.texts["messages"]["support_us"],
             reply_markup=None,
         )
 
@@ -524,9 +520,6 @@ def start_kb():
     volunteers_button = types.reply_keyboard.KeyboardButton(
         text=dp.bot.texts["buttons"]["volunteers"]
     )
-    announcements_button = types.reply_keyboard.KeyboardButton(
-        text=dp.bot.texts["buttons"]["announcements"]
-    )
     about_button = types.reply_keyboard.KeyboardButton(
         text=dp.bot.texts["buttons"]["about"]
     )
@@ -535,7 +528,7 @@ def start_kb():
     )
     kb = types.reply_keyboard.ReplyKeyboardMarkup(resize_keyboard=True)
     kb.row(need_home_bt, help_button)
-    kb.row(volunteers_button, announcements_button)
+    kb.row(volunteers_button)
     if dp.bot.easter_egg_enabled:
         kb.row(about_button, easter_egg_button)
     else:
@@ -574,13 +567,13 @@ def help_kb():
     need_other_bt = types.reply_keyboard.KeyboardButton(
         text=dp.bot.texts["buttons"]["need_other"]
     )
-    bank_bills = types.reply_keyboard.KeyboardButton(
-        text=dp.bot.texts["buttons"]["bank_bills"]
+    support_us = types.reply_keyboard.KeyboardButton(
+        text=dp.bot.texts["buttons"]["support_us"]
     )
 
     kb = types.reply_keyboard.ReplyKeyboardMarkup(resize_keyboard=True)
     kb.row(need_money_bt, need_temp_bt)
-    kb.row(need_other_bt, bank_bills)
+    kb.row(need_other_bt, support_us)
     kb.row(
         types.reply_keyboard.KeyboardButton(
             text=dp.bot.texts["buttons"]["back_to_prev"]
