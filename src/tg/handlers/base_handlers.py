@@ -527,8 +527,8 @@ def start_kb():
         text=dp.bot.texts["buttons"]["easter_egg"]
     )
     kb = types.reply_keyboard.ReplyKeyboardMarkup(resize_keyboard=True)
-    kb.row(need_home_bt, help_button)
-    kb.row(volunteers_button)
+    kb.row(need_home_bt)
+    kb.row(help_button, volunteers_button)
     if dp.bot.easter_egg_enabled:
         kb.row(about_button, easter_egg_button)
     else:
