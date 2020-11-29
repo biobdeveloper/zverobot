@@ -28,11 +28,13 @@ try:
 except FileExistsError:
     pass
 
-upload_time_limit = timedelta(seconds=10)
+_UPLOAD_TIME_LIMIT = 60
+upload_time_limit = timedelta(seconds=_UPLOAD_TIME_LIMIT)
 
 
 async def clear_user_view(message, state):
     user_data = await state.get_data()
+    last_user_upload = user_data.get("last_user_upload")
     current_msg = user_data.get("msg_with_kb_id")
 
     if current_msg:
@@ -40,10 +42,12 @@ async def clear_user_view(message, state):
             chat_id=message.chat.id, message_id=current_msg
         )
         await state.set_data(default_user_data)
+        if last_user_upload:
+            await state.update_data(last_user_upload=last_user_upload)
 
 
-"""Handlers automatically registered in dispatcher,
-so they placed this file in the order of registration"""
+"""Handlers automatically registered in dispatcher
+so placed in the order of registration"""
 
 
 @dp.message_handler(
@@ -61,7 +65,6 @@ async def back_to_prev_handler(message: types.Message, state: FSMContext):
 @dp.message_handler(commands=["start", "restart"], state="*")
 async def start_handler(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
-    reset_data = False
 
     if not user_data:
         async with dp.bot.db.acquire() as conn:
@@ -69,13 +72,8 @@ async def start_handler(message: types.Message, state: FSMContext):
             telegram_user.pop("is_bot")
             telegram_user["version"] = __version__
             await insert_telegram_user(conn, **telegram_user)
-            reset_data = True
 
-    if message.text == "/restart":
-        reset_data = True
-
-    if reset_data:
-        await state.set_data(default_user_data)
+    await clear_user_view(message, state)
 
     await UserStates.start.set()
     await dp.bot.safe_send_message(
@@ -679,15 +677,22 @@ def post_view_kb(category, location, pet_type, post_id, has_prev=False, has_next
 
 @dp.message_handler(content_types=["photo"], state=UserStates.easter_egg)
 async def funny_photo_handler(message: types.Message, state: FSMContext):
+    # TODO work this!!!
     last_user_upload = (await state.get_data()).get("last_user_upload")
 
     user_delta = datetime.utcnow() - datetime.fromtimestamp(last_user_upload)
 
     if user_delta < upload_time_limit:
-        msg = dp.bot.texts["messages"]["upload_time_limit"].format(upload_time_limit)
+        msg = dp.bot.texts["messages"]["upload_time_limit"].format(_UPLOAD_TIME_LIMIT)
     else:
+        await state.update_data(
+            {"last_user_upload": int(datetime.utcnow().timestamp())}
+        )
         await message.forward(dp.bot.photo_stock_id)
         msg = dp.bot.texts["messages"]["photo_received"]
+        await state.update_data(
+            {"last_user_upload": int(datetime.utcnow().timestamp())}
+        )
 
     await dp.bot.safe_send_message(chat_id=message.chat.id, text=msg)
 
