@@ -41,9 +41,10 @@ async def clear_user_view(message, state):
         await dp.bot.safe_delete_message(
             chat_id=message.chat.id, message_id=current_msg
         )
-        await state.set_data(default_user_data)
-        if last_user_upload:
-            await state.update_data(last_user_upload=last_user_upload)
+    await state.set_data(default_user_data)
+
+    if last_user_upload:
+        await state.update_data(last_user_upload=last_user_upload)
 
 
 """Handlers automatically registered in dispatcher
