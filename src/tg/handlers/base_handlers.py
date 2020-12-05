@@ -39,7 +39,7 @@ async def clear_user_view(message, state):
 
     if current_msg:
         await dp.bot.safe_delete_message(
-            chat_id=message.chat.id, message_id=current_msg
+            chat_id=message.from_user.id, message_id=current_msg
         )
     await state.set_data(default_user_data)
 
@@ -293,54 +293,68 @@ async def filter_callback_handler(
 async def post_view_callback_query_handler(
     callback_query: types.CallbackQuery, state: FSMContext
 ):
-    # log.info(callback_query.data)
-    if callback_query.data == "location_cache":
-        msg = dp.bot.texts["messages"]["locations_list_header"]
-        locations_by_alphavite = sorted(
-            dp.bot.locations, key=lambda _location: _location.button_text
-        )
-        for i in locations_by_alphavite:
-            msg += f"{hcode(i.button_text)}\n"
-        msg += dp.bot.texts["messages"]["location_filter"]
-        await state.update_data({"input_value_await": callback_query.data})
+    try:
+        # log.info(callback_query.data)
+        if callback_query.data == "location_cache":
+            msg = dp.bot.texts["messages"]["locations_list_header"]
+            locations_by_alphavite = sorted(
+                dp.bot.locations, key=lambda _location: _location.button_text
+            )
+            for i in locations_by_alphavite:
+                msg += f"{hcode(i.button_text)}\n"
+            msg += dp.bot.texts["messages"]["location_filter"]
+            await state.update_data({"input_value_await": callback_query.data})
 
-        kb = location_filter_kb(dp.bot.locations)
-        await UserStates.filter.set()
-        await dp.bot.safe_edit_message(
-            message_id=callback_query.message.message_id,
+            kb = location_filter_kb(dp.bot.locations)
+            await UserStates.filter.set()
+            await dp.bot.safe_edit_message(
+                message_id=callback_query.message.message_id,
+                chat_id=callback_query.from_user.id,
+                text=msg,
+                reply_markup=kb,
+            )
+
+        elif callback_query.data == "pet_type_cache":
+            msg = dp.bot.texts["messages"]["pet_type_filter"]
+            await state.update_data({"input_value_await": callback_query.data})
+
+            kb = pet_type_filter_kb(dp.bot.pet_types)
+            await UserStates.filter.set()
+            await dp.bot.safe_edit_message(
+                message_id=callback_query.message.message_id,
+                chat_id=callback_query.from_user.id,
+                text=msg,
+                reply_markup=kb,
+            )
+        else:
+            query_data = callback_query.data.split(",")
+
+            direction = query_data[0]
+            category = query_data[1]
+            location = query_data[2]
+            pet_type = query_data[3]
+            post_id = int(query_data[4])
+
+            if location == "None":
+                location = None
+            if pet_type == "None":
+                pet_type = None
+
+            await post_view_build(
+                callback_query, state, direction, category, location, pet_type, post_id
+            )
+    except Exception as ex:
+        # Old Zverobot views processing
+        await dp.bot.safe_delete_message(
             chat_id=callback_query.from_user.id,
-            text=msg,
-            reply_markup=kb,
-        )
-
-    elif callback_query.data == "pet_type_cache":
-        msg = dp.bot.texts["messages"]["pet_type_filter"]
-        await state.update_data({"input_value_await": callback_query.data})
-
-        kb = pet_type_filter_kb(dp.bot.pet_types)
-        await UserStates.filter.set()
-        await dp.bot.safe_edit_message(
             message_id=callback_query.message.message_id,
-            chat_id=callback_query.from_user.id,
-            text=msg,
-            reply_markup=kb,
         )
-    else:
-        query_data = callback_query.data.split(",")
-
-        direction = query_data[0]
-        category = query_data[1]
-        location = query_data[2]
-        pet_type = query_data[3]
-        post_id = int(query_data[4])
-
-        if location == "None":
-            location = None
-        if pet_type == "None":
-            pet_type = None
-
-        await post_view_build(
-            callback_query, state, direction, category, location, pet_type, post_id
+        await clear_user_view(callback_query, state)
+        await UserStates.start.set()
+        await dp.bot.safe_send_message(
+            text=dp.bot.texts["messages"]["error_on_callback"],
+            chat_id=callback_query.from_user.id,
+            reply_markup=start_kb(),
         )
 
 
