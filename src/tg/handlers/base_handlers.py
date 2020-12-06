@@ -24,7 +24,8 @@ log = get_logger("handlers")
 
 
 try:
-    mkdir(".pics_storage")
+    mkdir("static")
+    mkdir("static/images")
 except FileExistsError:
     pass
 
@@ -723,7 +724,7 @@ async def get_funny_photo_handler(message: types.Message):
                 await dp.bot.send_photo(
                     chat_id=message.chat.id,
                     photo=open(
-                        f"{project_root_dir}/.pics_storage/{photo.filename}.png", "rb"
+                        f"{project_root_dir}/static/images/{photo.filename}.png", "rb"
                     ),
                     caption=photo.caption,
                     reply_markup=funny_photo_kb(user_db_data.funny_photos_subscribed),

@@ -11,5 +11,5 @@ venv/
 *.crt
 *.key
 
-.pics_storage/
+static/
 *.png
