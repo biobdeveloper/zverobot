@@ -44,7 +44,11 @@ class ZveroBot(Bot):
 
         # TODO implement this
         # asyncio.get_event_loop().create_task(self.notify())
+        asyncio.get_event_loop().run_until_complete(self._hello_msg())
         asyncio.get_event_loop().create_task(self._fetch_static_data_from_db())
+
+    async def _hello_msg(self):
+        await self.send_message(chat_id=self.root_id, text="Started")
 
     async def _fetch_static_data_from_db(self):
         async with self.db.acquire() as conn:
